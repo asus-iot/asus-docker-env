@@ -29,10 +29,26 @@ function asus_docker_env_check_docker() {
     fi
   else
     echo "Docker is not installed or the execute permission is not granted."
-    echo "Please refer to the following URL to install Docker."
-    echo "http://redmine.corpnet.asus/projects/configuration-management-service/wiki/Docker"
+    echo "Please install Docker first aned make sure you are able to run it."
   fi
   return 1
+}
+
+function asus_docker_env_check_required_packages {
+  if dpkg-query -s qemu-user-static 1>/dev/null 2>&1; then
+    echo "The package qemu-user-static is installed."
+  else
+    echo "The package qemu-user-static is not installed yet. Please install it first."
+    return 1
+  fi
+
+  if dpkg-query -s binfmt-support 1>/dev/null 2>&1; then
+    echo "The package binfmt-support is installed."
+  else
+    echo "The package binfmt-support is not installed yet. Please install it first."
+    return 1
+  fi
+  return 0
 }
 
 # Check to see if all the prerequisites are fullfilled.
@@ -53,6 +69,10 @@ function asus_docker_env_check_prerequisites() {
   fi
 
   if ! asus_docker_env_check_docker; then
+    return 1
+  fi
+
+  if ! asus_docker_env_check_required_packages; then
     return 1
   fi
 
