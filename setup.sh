@@ -2,10 +2,13 @@
 #
 # Provide the Docker environment for ASUS IoT.
 
+declare -r ASUS_DOCKER_ENV_DEFAULT_WORKDIR="/source"
+
 export ASUS_DOCKER_ENV_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export ASUS_DOCKER_ENV_SOURCE="${ASUS_DOCKER_ENV_DIR}"
 export ASUS_DOCKER_ENV_DOCKERFILE="${ASUS_DOCKER_ENV_DIR}/Dockerfile"
 export ASUS_DOCKER_ENV_IMAGE="asus-iot/asus-docker-env:latest"
+export ASUS_DOCKER_ENV_WORKDIR=${ASUS_DOCKER_ENV_DEFAULT_WORKDIR}
 
 function asus_docker_env_show_variables() {
   echo "====================================================================="
@@ -13,6 +16,7 @@ function asus_docker_env_show_variables() {
   echo "ASUS_DOCKER_ENV_SOURCE=${ASUS_DOCKER_ENV_SOURCE}"
   echo "ASUS_DOCKER_ENV_DOCKERFILE=${ASUS_DOCKER_ENV_DOCKERFILE}"
   echo "ASUS_DOCKER_ENV_IMAGE=${ASUS_DOCKER_ENV_IMAGE}"
+  echo "ASUS_DOCKER_ENV_WORKDIR=${ASUS_DOCKER_ENV_WORKDIR}"
   echo "====================================================================="
 }
 
@@ -87,28 +91,47 @@ function asus_docker_env_build_docker_image() {
 
 function asus_docker_env_run() {
   asus_docker_env_show_variables
+  if [[ "$ASUS_DOCKER_ENV_WORKDIR" != "$ASUS_DOCKER_ENV_DEFAULT_WORKDIR" ]]; then
+    echo "Create the symbolic link $ASUS_DOCKER_ENV_WORKDIR to $ASUS_DOCKER_ENV_SOURCE......."
+    ln -s $ASUS_DOCKER_ENV_SOURCE $ASUS_DOCKER_ENV_WORKDIR
+  fi
   if asus_docker_env_check_prerequisites; then
     asus_docker_env_build_docker_image
     if [ $# -eq 0 ]; then
       docker run --interactive --privileged --rm --tty \
-        --volume $ASUS_DOCKER_ENV_SOURCE:/source --workdir /source \
+        --volume $ASUS_DOCKER_ENV_SOURCE:$ASUS_DOCKER_ENV_WORKDIR \
+        --workdir $ASUS_DOCKER_ENV_WORKDIR \
+        --volume /var/run/docker.sock:/var/run/docker.sock \
+        --volume /var/lib/docker:/var/lib/docker \
         $ASUS_DOCKER_ENV_IMAGE /bin/bash -c \
         "groupadd --gid $(id -g) $(id -g -n); \
         useradd -m -e \"\" -s /bin/bash --gid $(id -g) --uid $(id -u) $(id -u -n); \
         passwd -d $(id -u -n); \
         echo \"$(id -u -n) ALL=(ALL) NOPASSWD:ALL\" >> /etc/sudoers; \
+        sudo groupmod -g $(awk -F\: '/docker/ {print $3}' /etc/group) docker; \
+        sudo usermod -aG docker $(id -u -n); \
         sudo -E -u $(id -u -n) --set-home /bin/bash -i"
     else
       docker run --interactive --privileged --rm --tty \
-        --volume $ASUS_DOCKER_ENV_SOURCE:/source --workdir /source \
+        --volume $ASUS_DOCKER_ENV_SOURCE:$ASUS_DOCKER_ENV_WORKDIR \
+        --workdir $ASUS_DOCKER_ENV_WORKDIR \
+        --volume /var/run/docker.sock:/var/run/docker.sock \
+        --volume /var/lib/docker:/var/lib/docker \
         $ASUS_DOCKER_ENV_IMAGE /bin/bash -c \
         "groupadd --gid $(id -g) $(id -g -n); \
         useradd -m -e \"\" -s /bin/bash --gid $(id -g) --uid $(id -u) $(id -u -n); \
         passwd -d $(id -u -n); \
         echo \"$(id -u -n) ALL=(ALL) NOPASSWD:ALL\" >> /etc/sudoers; \
+        sudo groupmod -g $(awk -F\: '/docker/ {print $3}' /etc/group) docker; \
+        sudo usermod -aG docker $(id -u -n); \
         sudo -E -u $(id -u -n) --set-home ${1}"
     fi
   fi
+  if [[ "$ASUS_DOCKER_ENV_WORKDIR" != "$ASUS_DOCKER_ENV_DEFAULT_WORKDIR" ]]; then
+    echo "Remove the symbolic link $ASUS_DOCKER_ENV_WORKDIR......."
+    unlink $ASUS_DOCKER_ENV_WORKDIR
+  fi
+  echo "The ASUS Docker environment is exited."
 }
 
 function asus_docker_env_set_dockerfile() {
@@ -125,6 +148,18 @@ function asus_docker_env_set_source() {
     echo "Please provide the source path."
   else
     export ASUS_DOCKER_ENV_SOURCE="$(readlink -f ${1})"
+    export ASUS_DOCKER_ENV_WORKDIR=${ASUS_DOCKER_ENV_DEFAULT_WORKDIR}
+    asus_docker_env_show_variables
+  fi
+}
+
+function asus_docker_env_set_source_with_symbolic_link() {
+  if [ $# -eq 0 ]; then
+    echo "Please provide the source path."
+  else
+    export ASUS_DOCKER_ENV_SOURCE="$(readlink -f ${1})"
+    export ASUS_DOCKER_ENV_WORKDIR=`echo ${ASUS_DOCKER_ENV_SOURCE} | md5sum | cut -f1 -d" "`
+    export ASUS_DOCKER_ENV_WORKDIR="/tmp/${ASUS_DOCKER_ENV_WORKDIR}"
     asus_docker_env_show_variables
   fi
 }
