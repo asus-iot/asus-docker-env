@@ -1,5 +1,13 @@
 # asus-docker-env
 
+This is only tested on Ubuntu.
+
+Please refer to https://docs.docker.com/engine/install/ubuntu/ and install Docker engine first.
+
+Then install required packages.
+
+    $ sudo apt-get install qemu-user-static binfmt-support
+
 You can setup your environment by running this:
 
     $ source setup.sh
@@ -8,7 +16,7 @@ The default Dockerfile is from ubuntu:20.04 (./focal/Dockerfile). You can use th
 
     $ asus_docker_env_set_dockerfile ./xenial/Dockerfile
 
-The default source path is same as where the script setup.sh is. You can use the following command to change to another one .
+The default source path is same as where the script file setup.sh is. You can use the following command to change to another one .
 
     $ asus_docker_env_set_source PATH_TO_YOUR_SOURCE
 
