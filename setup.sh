@@ -90,6 +90,7 @@ function asus_docker_env_build_docker_image() {
 }
 
 function asus_docker_env_run() {
+  echo "Entering the ASUS Docker environment......."
   asus_docker_env_show_variables
   if [[ "$ASUS_DOCKER_ENV_WORKDIR" != "$ASUS_DOCKER_ENV_DEFAULT_WORKDIR" ]]; then
     echo "Create the symbolic link $ASUS_DOCKER_ENV_WORKDIR to $ASUS_DOCKER_ENV_SOURCE......."
@@ -131,7 +132,8 @@ function asus_docker_env_run() {
     echo "Remove the symbolic link $ASUS_DOCKER_ENV_WORKDIR......."
     unlink $ASUS_DOCKER_ENV_WORKDIR
   fi
-  echo "The ASUS Docker environment is exited."
+
+  echo "Leaving the ASUS Docker environment......."
 }
 
 function asus_docker_env_set_dockerfile() {
