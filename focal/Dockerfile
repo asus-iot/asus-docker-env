@@ -38,10 +38,10 @@ RUN cd /opt/prebuilt-android-clang; git checkout 007c96f100c5322acc37b84669c032c
 ENV CLANG_PATH=/opt/prebuilt-android-clang
 
 # Configure GCC cross-compile tool chain
-RUN wget https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-a/10.2-2020.11/binrel/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf.tar.xz
-RUN tar -xvJf gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf.tar.xz -C /opt
-ENV AARCH64_GCC_CROSS_COMPILE=/opt/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-
-RUN rm gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf.tar.xz
+RUN wget https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-a/8.3-2019.03/binrel/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz
+RUN tar -xvJf gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz -C /opt
+ENV AARCH64_GCC_CROSS_COMPILE=/opt/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu/bin/aarch64-linux-gnu-
+RUN rm gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz
 
 # Install additional package for the NXP Android build
 RUN apt-get update && \
