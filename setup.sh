@@ -100,6 +100,7 @@ function asus_docker_env_run() {
     asus_docker_env_build_docker_image
     if [ $# -eq 0 ]; then
       docker run --interactive --privileged --rm --tty \
+        --hostname asus-docker-env \
         --volume $ASUS_DOCKER_ENV_SOURCE:$ASUS_DOCKER_ENV_WORKDIR \
         --workdir $ASUS_DOCKER_ENV_WORKDIR \
         --volume /var/run/docker.sock:/var/run/docker.sock \
@@ -114,6 +115,7 @@ function asus_docker_env_run() {
         sudo -E -u $(id -u -n) --set-home /bin/bash -i"
     else
       docker run --interactive --privileged --rm --tty \
+        --hostname asus-docker-env \
         --volume $ASUS_DOCKER_ENV_SOURCE:$ASUS_DOCKER_ENV_WORKDIR \
         --workdir $ASUS_DOCKER_ENV_WORKDIR \
         --volume /var/run/docker.sock:/var/run/docker.sock \
