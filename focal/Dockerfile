@@ -43,6 +43,13 @@ RUN tar -xvJf gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz -C /opt
 ENV AARCH64_GCC_CROSS_COMPILE=/opt/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu/bin/aarch64-linux-gnu-
 RUN rm gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz
 
+# Configure GCC cross-compile tool chain for Jetson platform
+RUN wget http://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz
+RUN tar -xvJf gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz -C /opt
+ENV NV_TOOLCHAIN_PREFIX=/opt/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
+RUN rm gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz
+
+
 # Install additional package for the NXP Android build
 RUN apt-get update && \
     apt-get install -y uuid uuid-dev zlib1g-dev liblz-dev liblzo2-2 \
@@ -54,3 +61,7 @@ RUN apt-get update && \
 # Fix the failure for the NXP Android build
 RUN apt-get update && \
     apt-get install -y libncurses5
+
+# Fix the failure for the Jetson platform build
+RUN apt-get update && \
+    apt-get install -y xxd
