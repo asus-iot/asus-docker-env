@@ -7,7 +7,7 @@ declare -r ASUS_DOCKER_ENV_DEFAULT_WORKDIR="/source"
 export ASUS_DOCKER_ENV_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export ASUS_DOCKER_ENV_SOURCE="${ASUS_DOCKER_ENV_DIR}"
 export ASUS_DOCKER_ENV_DOCKERFILE="${ASUS_DOCKER_ENV_DIR}/Dockerfile"
-export ASUS_DOCKER_ENV_IMAGE="asus-iot/asus-docker-env:latest"
+export ASUS_DOCKER_ENV_IMAGE="asus-iot/asus-docker-env-linux4.4-rk3288-tinker_board:latest"
 export ASUS_DOCKER_ENV_WORKDIR=${ASUS_DOCKER_ENV_DEFAULT_WORKDIR}
 
 function asus_docker_env_show_variables() {
