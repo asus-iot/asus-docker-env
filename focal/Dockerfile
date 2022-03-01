@@ -8,11 +8,10 @@ RUN apt-get update && \
     locales parted python python3 qemu-user-static rsync \
     software-properties-common sudo time tzdata udev unzip wget zip
 
-RUN wget https://github.com/rockchip-linux/rk-rootfs-build/raw/master/ubuntu-build-service/packages/debootstrap_1.0.87_all.deb
-RUN wget https://github.com/rockchip-linux/rk-rootfs-build/raw/master/ubuntu-build-service/packages/live-build_3.0.5-1linaro1_all.deb
+COPY packages .
+
 RUN dpkg -i debootstrap_1.0.87_all.deb live-build_3.0.5-1linaro1_all.deb
 RUN apt-get install -f -y
-RUN rm debootstrap_1.0.87_all.deb live-build_3.0.5-1linaro1_all.deb
 
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 RUN apt-key fingerprint 0EBFCD88
